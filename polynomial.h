@@ -39,4 +39,4 @@ Polynomial *polynomial_clone(const Polynomial *poly);
 
 int polynomial_is_empty(const Polynomial *poly);
 
-#endif //LAB1_POLYNOMIAL_H
+#endif //LAB1_POLYNOMIAL_H*

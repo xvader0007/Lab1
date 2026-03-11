@@ -47,7 +47,7 @@ static void int_print(void* value)
 
 Field_info *field_info_get_int(void*)
 {
-    if(!field_info_int) //проыерка на первый вызов
+    if(!field_info_int) //проверка на первый вызов
     {
         field_info_int = malloc(sizeof(Field_info));
         if(!field_info_int) return NULL;
