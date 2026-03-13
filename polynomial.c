@@ -121,3 +121,81 @@ void polynomial_clear(Polynomial* poly)
     poly->degree = 0;
 }
 
+int polynomial_set_coeff(Polynomial* poly, int index, const void* value)
+{
+    void* target;
+    void* clon_value;
+
+    if(!poly || !value || !poly->type_info || !poly->type_info->clone) return -1;
+
+    if(polynomial_capacity(poly, index + 1) != 0) return -1;
+
+    //освобождаем старый коэф
+    target = polynomial_get_coef_ptr(poly, index);
+    if(target && index <= poly->degree) poly->type_info->free(target);
+
+    //копируем значение
+    clon_value = poly->type_info->clone((void*)value);
+    if(!clon_value) return -1;
+
+    //копируем в массив
+    memcpy(target, clon_value, poly->type_info->size_el);
+    poly->type_info->free(clon_value);
+
+    //обновление степени
+    if(index > poly->degree) poly->degree = index;
+
+    polynomial_update_degree(poly);
+
+    return 0;
+}
+
+int polynomial_get_coef(const Polynomial* poly, size_t index, void* out)
+{
+    void *coef;
+
+    if (!poly || !out || !poly->type_info) return -1;
+
+    if (index > poly->degree) {
+        memset(out, 0, poly->type_info->size_el);
+
+        return 0;
+    }
+}
+
+size_t polynomial_get_degree(const Polynomial* poly)
+{
+    if(!poly) return 0;
+    return poly->degree;
+}
+
+int polynomal_add(Polynomial* result, const Polynomial* a, const Polynomial* b)
+{
+    int max_degree;
+    void* coef_a;
+    void* coef_b;
+    void* coef_result;
+
+    if(!result || !a || !b) return -1;
+
+    if(!field_info_compare(a->type_info, b->type_info)) return -1;
+
+    max_degree = (a->degree > b->degree);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
