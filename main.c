@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "complex.c"
+#include "tests.h"
 
 int main(void)
 {
@@ -11,6 +12,8 @@ int main(void)
     b.imag_part = -2.71;
     complex_print(a);
     complex_print(b);
+
+
 
     return 0;
 }
