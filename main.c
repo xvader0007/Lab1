@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <math.h>
 #include "complex.c"
+#include "field_info.h"
+#include "polynomial.h"
 #include "tests.h"
 
 int main(void)
@@ -13,7 +15,7 @@ int main(void)
     complex_print(a);
     complex_print(b);
 
-
+    tests_run_all();
 
     return 0;
 }

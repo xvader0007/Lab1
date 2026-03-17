@@ -15,11 +15,11 @@ static void test_polynomial_create_int(void)
     Polynomial* poly;
     int passed = 1;
 
-    poly = polynomial_create(field_info_get_int);
+    poly = polynomial_create(field_info_get_int());
 
     passed = passed && (poly != NULL);
     passed = passed && (poly->degree == 0);
-    passed = passed && (poly->type_info == field_info_get_int);
+    passed = passed && (poly->type_info == field_info_get_int(poly));
 
     if(poly) polynomial_destroy(poly);
 
@@ -31,10 +31,10 @@ static void test_polynomial_create_complex(void)
     Polynomial* poly;
     int passed = 1;
 
-    poly = polynomial_create(field_info_get_complex);
+    poly = polynomial_create(field_info_get_complex(poly));
 
     passed = passed && (poly != 0);
-    passed = passed && (poly->type_info == field_info_get_complex);
+    passed = passed && (poly->type_info == field_info_get_complex(poly));
 
     if(poly) polynomial_destroy(poly);
 
@@ -47,7 +47,7 @@ static void test_set_get_coef_int(void)
     int value, result;
     int passed;
 
-    poly = polynomial_create(field_info_get_int);
+    poly = polynomial_create(field_info_get_int(poly));
 
     value = 1;
     polynomial_set_coef(poly, 0, &value);
@@ -84,7 +84,7 @@ static void test_set_get_coef_complex(void)
     Complex value, result;
     int passed;
 
-    poly = polynomial_create(field_info_get_complex);
+    poly = polynomial_create(field_info_get_complex(poly));
 
     value = (Complex){3, 4};
     polynomial_set_coef(poly, 0, &value);
@@ -110,9 +110,9 @@ static void test_polynomial_add_int(void)
     int coef;
     int passed = 1;
 
-    a = polynomial_create(field_info_get_int);
-    b = polynomial_create(field_info_get_int);
-    result = polynomial_create(field_info_get_int);
+    a = polynomial_create(field_info_get_int(a));
+    b = polynomial_create(field_info_get_int(b));
+    result = polynomial_create(field_info_get_int(result));
 
     // a = x + 2 | b = 3x + 4 | a + b = 4x + 5
     coef = 1;
@@ -130,10 +130,10 @@ static void test_polynomial_add_int(void)
     polynomial_add(result, a, b);
 
     polynomial_get_coef(result, 0, &coef);
-    passed = passed && (result == 4);
+    passed = passed && (coef == 4);
 
     polynomial_get_coef(result, 1, &coef);
-    passed = passed && (result == 5);
+    passed = passed && (coef == 5);
 
     polynomial_destroy(a);
     polynomial_destroy(b);
@@ -148,9 +148,9 @@ static void test_polynomial_complex(void)
     Complex coef;
     int passed = 1;
 
-    a = polynomial_create(field_info_get_complex);
-    b = polynomial_create(field_info_get_complex);
-    result = polynomial_create(field_info_get_complex);
+    a = polynomial_create(field_info_get_complex(a));
+    b = polynomial_create(field_info_get_complex(b));
+    result = polynomial_create(field_info_get_complex(result));
 
     coef = (Complex){1, 2};
     polynomial_set_coef(a, 1, &coef);
@@ -177,9 +177,9 @@ static void test_polynomial_mult_int(void)
     int coef;
     int passed = 1;
 
-    a = polynomial_create(field_info_get_int);
-    b = polynomial_create(field_info_get_int);
-    result = polynomial_create(field_info_get_int);
+    a = polynomial_create(field_info_get_int(a));
+    b = polynomial_create(field_info_get_int(b));
+    result = polynomial_create(field_info_get_int(result));
 
     // a = x + 1 | b = x + 2 | a * b = x^2 + 3x + 2
     coef = 1;
@@ -216,9 +216,9 @@ static void test_polynomial_mult_complex(void)
     Complex coef;
     int passed = 1;
 
-    a = polynomial_create(field_info_get_complex);
-    b = polynomial_create(field_info_get_complex);
-    result = polynomial_create(field_info_get_complex);
+    a = polynomial_create(field_info_get_complex(a));
+    b = polynomial_create(field_info_get_complex(b));
+    result = polynomial_create(field_info_get_complex(result));
 
     //(1 + 2i)x * (3 + 4i)x
     coef = (Complex){1, 2};
@@ -229,4 +229,103 @@ static void test_polynomial_mult_complex(void)
 
     polynomial_mult(result, a, b);
     //-5x^2 + 10x^2i
+}
+
+static void test_polynomial_mult_scal_int(void)
+{
+    Polynomial *poly;
+    int coef, scalar;
+    int passed = 1;
+
+    poly = polynomial_create(field_info_get_int(poly));
+
+    // P(x) = 2x + 3 | scalar = 2 | P(x) * scalar = 4x + 6
+    coef = 3;
+    polynomial_set_coef(poly, 0, &coef);
+
+    coef = 2;
+    polynomial_set_coef(poly, 1, &coef);
+
+    scalar = 2;
+    polynomial_mult_scal(poly, &scalar);
+
+    polynomial_get_coef(poly, 0, &coef);
+    passed = passed && (coef == 6);
+
+    polynomial_get_coef(poly, 1, &coef);
+    passed = passed && (coef == 4);
+
+    polynomial_destroy(poly);
+
+    test_print_result("test_polynomial_mult_scal", passed);
+}
+
+static void test_polynomial_evalute_int(void)
+{
+    Polynomial *poly;
+    int a, coef, result;
+    int passed = 1;
+
+    poly = polynomial_create(field_info_get_int(poly));
+
+    //P(x) = 2x^2 +3x + 1, P(2) = 2*(2)^2 + 3*2 + 1 = 15
+    coef = 1;
+    polynomial_set_coef(poly, 0, &coef);
+
+    coef = 3;
+    polynomial_set_coef(poly, 1, &coef);
+
+    coef = 2;
+    polynomial_set_coef(poly, 2, &coef);
+
+    a = 2;
+    polynomial_evaluate(poly, &a, &result);
+
+    passed = passed && (result == 15);
+
+    polynomial_destroy(poly);
+
+    test_print_result("test_polynomial_evalute_int", passed);
+}
+
+static void test_polynomial_null_checks(void)
+{
+    Polynomial *poly;
+    int passed = 1;
+
+    passed = passed && (polynomial_create(NULL) == NULL);
+
+    poly = polynomial_create(field_info_get_int(poly));
+
+    passed = passed && (polynomial_set_coef(NULL, 0, &poly) != 0);
+    passed = passed && (polynomial_get_coef(poly, 0, NULL) != 0);
+
+    polynomial_destroy(poly);
+
+    test_print_result("test_polynomial_null_checks", passed);
+}
+
+static void test_polynomial_type_mismatch(void)
+{
+    Polynomial *int_poly, *complex_poly, *result;
+    int passed = 1;
+
+    int_poly = polynomial_create(field_info_get_int(int_poly));
+    complex_poly = polynomial_create(field_info_get_complex(complex_poly));
+    result = polynomial_create(field_info_get_int(result));
+
+    passed = passed && (polynomial_add(result, int_poly, complex_poly) != 0);
+
+    polynomial_destroy(int_poly);
+    polynomial_destroy(complex_poly);
+    polynomial_destroy(result);
+
+    test_print_result("test_polynomial_type_mismatch", passed);
+}
+
+void tests_run_all(void)
+{
+    printf("=== Запуск тестов для Вариант 15 (Многочлен) ===\\n\\n");
+
+
 }
