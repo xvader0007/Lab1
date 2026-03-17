@@ -16,8 +16,8 @@ Complex complex_mult(Complex a, Complex b)
 {
     Complex result;
 
-    result.real_part = a.real_part * b.real_part;
-    result.imag_part = b.imag_part * b.imag_part;
+    result.real_part = a.real_part * b.real_part - a.imag_part * b.imag_part;
+    result.imag_part = a.real_part * b.imag_part + a.imag_part * b.real_part;
 
     return result;
 }

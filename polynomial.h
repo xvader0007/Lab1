@@ -19,9 +19,9 @@ void polynomial_destroy(Polynomial *poly);
 
 void polynomial_clear(Polynomial *poly);
 
-int polynomial_set_coef(Polynomial *poly, size_t index, const void* value);
+int polynomial_set_coef(Polynomial *poly, int index, const void* value);
 
-int polynomial_get_coef(const Polynomial *poly, size_t index, void* value);
+int polynomial_get_coef(const Polynomial *poly, int index, void* value);
 
 size_t polynomial_get_degree(const Polynomial *poly);
 

@@ -45,7 +45,7 @@ static void int_print(void* value)
     printf("%d", *(int*)value);
 }
 
-Field_info *field_info_get_int(void*)
+Field_info *field_info_get_int(void)
 {
     if(!field_info_int) //проверка на первый вызов
     {
@@ -102,7 +102,7 @@ static void complex_print_field(void* value)
     return complex_print(*(Complex*)value);
 }
 
-Field_info *field_info_get_complex(void*)
+Field_info *field_info_get_complex(void)
 {
     if(!field_info_complex)
     {

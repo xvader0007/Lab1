@@ -48,8 +48,8 @@ static void polynomial_update_degree(Polynomial* poly)
         coef = polynomial_get_coef_ptr(poly, i);
         if(!coef) continue;
 
-        if(poly->type_info == field_info_get_int) zero = (*(int*)coef == 0);
-        else if(poly->type_info == field_info_get_complex)
+        if(poly->type_info == field_info_get_int()) zero = (*(int*)coef == 0);
+        else if(poly->type_info == field_info_get_complex())
         {
             Complex a = *(Complex *)coef;
             zero = complex_equal(a, (Complex) {0, 0});
@@ -121,7 +121,7 @@ void polynomial_clear(Polynomial* poly)
     poly->degree = 0;
 }
 
-int polynomial_set_coeff(Polynomial* poly, int index, const void* value)
+int polynomial_set_coef(Polynomial* poly, int index, const void* value)
 {
     void* target;
     void* clon_value;
@@ -150,7 +150,7 @@ int polynomial_set_coeff(Polynomial* poly, int index, const void* value)
     return 0;
 }
 
-int polynomial_get_coef(const Polynomial* poly, size_t index, void* out)
+int polynomial_get_coef(const Polynomial* poly, int index, void* out)
 {
     void *coef;
 
@@ -161,6 +161,13 @@ int polynomial_get_coef(const Polynomial* poly, size_t index, void* out)
 
         return 0;
     }
+
+    coef = polynomial_get_coef_ptr(poly, index);
+    if(!coef) return -1;
+
+    memcpy(out, coef, poly->type_info->size_el);
+
+    return 0;
 }
 
 size_t polynomial_get_degree(const Polynomial* poly)
@@ -169,7 +176,7 @@ size_t polynomial_get_degree(const Polynomial* poly)
     return poly->degree;
 }
 
-int polynomal_add(Polynomial* result, const Polynomial* a, const Polynomial* b)
+int polynomial_add(Polynomial* result, const Polynomial* a, const Polynomial* b)
 {
     int max_degree;
     void* coef_a;
@@ -190,21 +197,21 @@ int polynomal_add(Polynomial* result, const Polynomial* a, const Polynomial* b)
         if(i <= a->degree) coef_a = polynomial_get_coef_ptr(a,  i);
         else coef_a = NULL;
 
-        if(i <= b->degree) coef_a = polynomial_get_coef_ptr(b, i);
+        if(i <= b->degree) coef_b = polynomial_get_coef_ptr(b, i);
         else coef_b = NULL;
 
         coef_result = polynomial_get_coef_ptr(result, i);
 
         if(!coef_result) return -1;
 
-        if(result->type_info = field_info_get_int)
+        if(result->type_info = field_info_get_int())
         {
             int int_a = coef_a ? *(int*)coef_a : 0;
             int int_b = coef_b ? *(int*)coef_b : 0;
             int sum = int_a + int_b;
             memcpy(coef_result, &sum, sizeof(int));
         }
-        else if(result->type_info == field_info_get_complex)
+        else if(result->type_info == field_info_get_complex())
         {
             Complex c_a = coef_a ? *(Complex*)coef_a : (Complex){0,0};
             Complex c_b = coef_b ? *(Complex*)coef_b : (Complex){0,0};
@@ -241,12 +248,12 @@ int polynomial_mult(Polynomial* result, const Polynomial* a, const Polynomial* b
         for(int j = 0; j < b->degree; j++)
         {
             void* coef_a = polynomial_get_coef_ptr(a, i);
-            void* coef_b = polynomial_get_coef_ptr(b, i);
+            void* coef_b = polynomial_get_coef_ptr(b, j);
             void* coef_result = polynomial_get_coef_ptr(result, i + j);
 
             if(!coef_a || !coef_b || !coef_result) continue;
 
-            if(result->type_info == field_info_get_int)
+            if(result->type_info == field_info_get_int())
             {
                 int int_a = *(int*)coef_a;
                 int int_b = *(int*)coef_b;
@@ -255,7 +262,7 @@ int polynomial_mult(Polynomial* result, const Polynomial* a, const Polynomial* b
 
                 memcpy(coef_result, &res_mult, sizeof(int));
             }
-            else if(result->type_info == field_info_get_complex)
+            else if(result->type_info == field_info_get_complex())
             {
                 Complex c_a = *(Complex*)coef_a;
                 Complex c_b = *(Complex*)coef_b;
@@ -283,7 +290,7 @@ int polynomial_mult_scal(Polynomial* poly, const void* scalar)
         coef = polynomial_get_coef_ptr(poly, i);
         if(!coef) continue;
 
-        if(poly->type_info == field_info_get_int)
+        if(poly->type_info == field_info_get_int())
         {
             int int_coef = *(int*)coef;
             int int_scalar = *(int*)scalar;
@@ -292,10 +299,10 @@ int polynomial_mult_scal(Polynomial* poly, const void* scalar)
 
             memcpy(coef, &int_coef, sizeof(int));
         }
-        else if(poly->type_info == field_info_get_complex)
+        else if(poly->type_info == field_info_get_complex())
         {
             Complex c_coef = *(Complex*)coef;
-            Complex c_scalar = *(Complex*)coef;
+            Complex c_scalar = *(Complex*)scalar;
 
             c_coef = complex_mult(c_coef, c_scalar);
 
@@ -308,7 +315,7 @@ int polynomial_mult_scal(Polynomial* poly, const void* scalar)
     return 0;
 }
 
-int polynomial_evalute(const Polynomial *poly, const void* a, void* result)
+int polynomial_evaluate(const Polynomial *poly, const void* a, void* result)
 {
     void* coef;
 
@@ -333,7 +340,7 @@ int polynomial_evalute(const Polynomial *poly, const void* a, void* result)
     //Схема горнера P(x) = a_0 + x(a_1 + x(a_2 + ... + x(a_n)))
     for(int i = poly->degree; i > 0; i--)
     {
-        if(poly->type_info == field_info_get_int)
+        if(poly->type_info == field_info_get_int())
         {
             int int_result = *(int*)result;
             int int_a = *(const int*)a;
@@ -342,7 +349,7 @@ int polynomial_evalute(const Polynomial *poly, const void* a, void* result)
 
             memcpy(result, &int_result, sizeof(int));
         }
-        else if(poly->type_info == field_info_get_complex)
+        else if(poly->type_info == field_info_get_complex())
         {
             Complex c_result = *(Complex*)result;
             Complex c_a = *(const Complex*)a;
@@ -356,7 +363,7 @@ int polynomial_evalute(const Polynomial *poly, const void* a, void* result)
         coef = polynomial_get_coef_ptr(poly, i - 1);
         if(coef)
         {
-            if(poly->type_info == field_info_get_int)
+            if(poly->type_info == field_info_get_int())
             {
                 int int_result = *(int*)result;
                 int int_a = *(int*)coef;
@@ -365,7 +372,7 @@ int polynomial_evalute(const Polynomial *poly, const void* a, void* result)
 
                 memcpy(result, &int_result, sizeof(int));
             }
-            else if(poly->type_info == field_info_get_complex)
+            else if(poly->type_info == field_info_get_complex())
             {
                 Complex c_result = *(Complex*)result;
                 Complex c_a = *(Complex*)coef;
@@ -409,11 +416,11 @@ void polynomial_print(const Polynomial* poly)
         coef = polynomial_get_coef_ptr(poly, i);
         if(!coef) return;
 
-        if(poly->type_info == field_info_get_int)
+        if(poly->type_info == field_info_get_int())
         {
             if(*(int*)coef == 0 && i > 0) continue;
         }
-        else if(poly->type_info == field_info_get_complex)
+        else if(poly->type_info == field_info_get_complex())
         {
             Complex c_coef = *(Complex*)coef;
             if(complex_equal(c_coef, (Complex){0,0}) && i > 0) continue;
