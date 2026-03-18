@@ -1,5 +1,5 @@
 #include "polynomial.h"
-#include "Complex.h"
+#include "complex.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,8 +19,8 @@ static int polynomial_capacity(Polynomial *poly, size_t min_capacity)
     new_coef = realloc(poly->coeff, new_capacity * poly->type_info->size_el);
     if(!new_coef) return -1;
 
-    memset((char*)new_coef + poly->capacity * poly->type_info->size_el, 0,
-           (new_capacity - poly->capacity) * poly->type_info->size_el); //обнуляем часть новую часть массива
+    //обнуляем часть новую часть массива
+    memset((char*)new_coef + poly->capacity * poly->type_info->size_el, 0, (new_capacity - poly->capacity) * poly->type_info->size_el);
 
     poly->coeff = new_coef;
     poly->capacity = new_capacity;
@@ -31,7 +31,7 @@ static int polynomial_capacity(Polynomial *poly, size_t min_capacity)
 //получение указателя на коэф по индексу
 static void *polynomial_get_coef_ptr(const Polynomial* poly, int index)
 {
-    if(!poly || !poly->coeff || index > !poly->degree) return NULL;
+    if(!poly || !poly->coeff) return NULL;
     return (char*)poly->coeff + index * poly->type_info->size_el;
 }
 
@@ -56,10 +56,14 @@ static void polynomial_update_degree(Polynomial* poly)
         }
         else zero = 0;
 
-        if(!zero) break;
-
-        poly->degree = i;
+        if(!zero) {
+            poly->degree = i;
+            return;
+        }
     }
+
+    // Если все коэффициенты нулевые
+    poly->degree = 0;
 }
 
 Polynomial *polynomial_create(Field_info* type_info)
@@ -89,64 +93,48 @@ Polynomial *polynomial_create(Field_info* type_info)
 
 void polynomial_destroy(Polynomial* poly)
 {
-    void* coef;
-
     if(!poly) return;
-
-    if(poly->coeff && poly->type_info)
-    {
-        for(int i = 0; i < poly->degree; i++)
-        {
-            coef = polynomial_get_coef_ptr(poly, i);
-            if(coef) poly->type_info->free(coef);
-        }
+    if(poly->coeff) {
         free(poly->coeff);
     }
     free(poly);
 }
 
+
 void polynomial_clear(Polynomial* poly)
 {
-    void* coef;
-
     if(!poly || !poly->type_info) return;
-
-    for(int i = 0; i <= poly->degree; i++)
-    {
-        coef = polynomial_get_coef_ptr(poly, i);
-        if(coef) poly->type_info->free(coef);
-    }
-
     memset(poly->coeff, 0, poly->capacity * poly->type_info->size_el);
     poly->degree = 0;
 }
 
-int polynomial_set_coef(Polynomial* poly, int index, const void* value)
+int polynomial_set_coef(Polynomial *poly, int index, const void *value)
 {
-    void* target;
-    void* clon_value;
+    void *target;
+    void *cloned_value;
 
-    if(!poly || !value || !poly->type_info || !poly->type_info->clone) return -1;
+    if (!poly || !value || !poly->type_info || !poly->type_info->clone)
+        return -1;
 
-    if(polynomial_capacity(poly, index + 1) != 0) return -1;
+    if (polynomial_capacity(poly, index + 1) != 0)
+        return -1;
 
-    //освобождаем старый коэф
+    // Клонируем новое значение
+    cloned_value = poly->type_info->clone((void *)value);
+    if (!cloned_value)
+        return -1;
+
+    // Копируем в массив (перезаписываем старое значение)
     target = polynomial_get_coef_ptr(poly, index);
-    if(target && index <= poly->degree) poly->type_info->free(target);
+    memcpy(target, cloned_value, poly->type_info->size_el);
 
-    //копируем значение
-    clon_value = poly->type_info->clone((void*)value);
-    if(!clon_value) return -1;
+    // Освобождаем ВРЕМЕННУЮ копию (которую создал clone)
+    poly->type_info->free(cloned_value);
 
-    //копируем в массив
-    memcpy(target, clon_value, poly->type_info->size_el);
-    poly->type_info->free(clon_value);
-
-    //обновление степени
-    if(index > poly->degree) poly->degree = index;
+    if (index > poly->degree)
+        poly->degree = index;
 
     polynomial_update_degree(poly);
-
     return 0;
 }
 
@@ -204,7 +192,7 @@ int polynomial_add(Polynomial* result, const Polynomial* a, const Polynomial* b)
 
         if(!coef_result) return -1;
 
-        if(result->type_info = field_info_get_int())
+        if(result->type_info == field_info_get_int())
         {
             int int_a = coef_a ? *(int*)coef_a : 0;
             int int_b = coef_b ? *(int*)coef_b : 0;
@@ -243,9 +231,9 @@ int polynomial_mult(Polynomial* result, const Polynomial* a, const Polynomial* b
     memset(result->coeff, 0, result->capacity * result->type_info->size_el);
     result->degree = result_degree;
 
-    for(int i = 0; i < a->degree; i++)
+    for(int i = 0; i <= a->degree; i++)
     {
-        for(int j = 0; j < b->degree; j++)
+        for(int j = 0; j <= b->degree; j++)
         {
             void* coef_a = polynomial_get_coef_ptr(a, i);
             void* coef_b = polynomial_get_coef_ptr(b, j);
@@ -267,7 +255,7 @@ int polynomial_mult(Polynomial* result, const Polynomial* a, const Polynomial* b
                 Complex c_a = *(Complex*)coef_a;
                 Complex c_b = *(Complex*)coef_b;
                 Complex c_res = *(Complex*)coef_result;
-                Complex c_mult = complex_add(c_res, complex_add(c_a, c_b));
+                Complex c_mult = complex_add(c_res, complex_mult(c_a, c_b));
 
                 memcpy(coef_result, &c_mult, sizeof(Complex));
             }
@@ -448,7 +436,7 @@ Polynomial* polynomial_clone(const Polynomial* poly)
     Polynomial* clone;
     void* coef;
 
-    if(!coef) return NULL;
+    if(!poly) return NULL;
 
     clone = polynomial_create(poly->type_info);
     if(!clone) return NULL;

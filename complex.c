@@ -34,8 +34,8 @@ Complex complex_scal_mult(Complex a, double scalar)
 
 int complex_equal(Complex a, Complex b)
 {
-    if((a.real_part == b.real_part) && (a.imag_part == b.imag_part)) return 1;
-    else return 0;
+    const double e = 1e-9;
+    return (fabs(a.real_part - b.real_part) < e) && (fabs(a.imag_part - b.imag_part) < e);
 }
 
 void complex_print(Complex a)
@@ -43,7 +43,7 @@ void complex_print(Complex a)
     if(a.real_part != 0 && a.imag_part != 0)
     {
         if(a.imag_part > 0) printf("%.2f+%.2fi\n", a.real_part, a.imag_part);
-        else printf("%.2f%.2fi", a.real_part, a.imag_part);
+        else printf("%.2f%.2fi\n", a.real_part, a.imag_part);
     }
     else if(a.real_part == 0 && a.imag_part != 0) printf("%.2fi\n", a.imag_part);
     else if(a.real_part != 0 && a.imag_part == 0) printf("%.2f\n", a.real_part);

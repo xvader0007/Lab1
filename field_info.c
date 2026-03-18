@@ -30,7 +30,7 @@ static void *int_clone(void *value)
 
 static void int_free(void* value)
 {
-    free(value);
+    (void)value;
 }
 
 static int int_equal(void* a, void* b)
@@ -87,7 +87,7 @@ static void *complex_clone(void* value)
 
 static void complex_free(void* value)
 {
-    free(value);
+    (void)value;
 }
 
 static int complex_equals(void* a, void* b)
