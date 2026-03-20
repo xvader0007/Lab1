@@ -82,7 +82,7 @@ void add_polynomials(Polynomial *poly1, Polynomial *poly2)
 
         printf("P2 = ");
         polynomial_print(poly2);
-        printf("P1 + P2");
+        printf("P1 + P2 = ");
         polynomial_print(result);
     }
     else
@@ -110,7 +110,7 @@ void mult_polynomials(Polynomial *poly1, Polynomial *poly2)
 
         printf("P2 = ");
         polynomial_print(poly2);
-        printf("P1 * P2");
+        printf("P1 * P2 = ");
         polynomial_print(result);
     }
     else
