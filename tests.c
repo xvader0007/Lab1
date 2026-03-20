@@ -268,7 +268,7 @@ static void test_polynomial_mult_scal_int(void)
     test_print_result("test_polynomial_mult_scal_int", passed);
 }
 
-void static test_polynomial_mult_scal_complex(void)
+static void test_polynomial_mult_scal_complex(void)
 {
     Polynomial *poly;
     Complex coef, scalar;
@@ -414,13 +414,13 @@ static void test_polynomial_clone_int()
     passed = passed && (clone != NULL);
     passed = passed && (clone->degree == poly->degree);
 
-    polynomial_get_coef(poly, 0, &result);
+    polynomial_get_coef(clone, 0, &result);
     passed = passed && (result == 1);
 
-    polynomial_get_coef(poly, 1, &result);
+    polynomial_get_coef(clone, 1, &result);
     passed = passed && (result == 3);
 
-    polynomial_get_coef(poly, 2, &result);
+    polynomial_get_coef(clone, 2, &result);
     passed = passed && (result == 2);
 
     //сlone не должен изменится
@@ -434,6 +434,31 @@ static void test_polynomial_clone_int()
     polynomial_destroy(clone);
 
     test_print_result("test_polynomial_clone_int", passed);
+}
+
+static void test_polynomial_print_int(void)
+{
+    Polynomial *poly;
+    int coef, passed = 1;
+
+    poly = polynomial_create(field_info_get_int());
+
+    //P(x) = 2x^2 + 3x + 1
+    coef = 1;
+    polynomial_set_coef(poly, 0, &coef);
+
+    coef = 3;
+    polynomial_set_coef(poly, 1, &coef);
+
+    coef = 2;
+    polynomial_set_coef(poly, 2, &coef);
+
+    printf("Print test: ");
+    polynomial_print(poly);
+
+    polynomial_destroy(poly);
+
+    test_print_result("test_polynomial_print_int", passed);
 }
 
 void tests_run_all(void)
@@ -455,6 +480,7 @@ void tests_run_all(void)
     test_polynomial_null_checks();
     test_polynomial_type_mismatch();
     test_polynomial_clone_int();
+    test_polynomial_print_int();
 
     printf("\n=== Тесты завершены ===\n");
 }
