@@ -392,9 +392,9 @@ void polynomial_print(const Polynomial* poly)
         if(coef)
         {
             poly->type_info->print(coef);
-            printf("\n");
+            printf("");
         }
-        else printf("0\n");
+        else printf("0");
 
         return;
     }

@@ -38,7 +38,7 @@ Polynomial* create_polynomial_menu(void)
 
     for(int i = 0; i < coef_count; i++)
     {
-        if(choice = 1)
+        if(choice == 1)
         {
             printf("\nВведите коэффициент: ");
             scanf("%d", &coef);

@@ -42,10 +42,10 @@ void complex_print(Complex a)
 {
     if(a.real_part != 0 && a.imag_part != 0)
     {
-        if(a.imag_part > 0) printf("%.2f+%.2fi\n", a.real_part, a.imag_part);
-        else printf("%.2f%.2fi\n", a.real_part, a.imag_part);
+        if(a.imag_part > 0) printf("%.2f+%.2fi", a.real_part, a.imag_part);
+        else printf("%.2f%.2fi", a.real_part, a.imag_part);
     }
-    else if(a.real_part == 0 && a.imag_part != 0) printf("%.2fi\n", a.imag_part);
-    else if(a.real_part != 0 && a.imag_part == 0) printf("%.2f\n", a.real_part);
+    else if(a.real_part == 0 && a.imag_part != 0) printf("%.2fi", a.imag_part);
+    else if(a.real_part != 0 && a.imag_part == 0) printf("%.2f", a.real_part);
     else printf("%d", 0);
 }
