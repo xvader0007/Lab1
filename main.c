@@ -196,25 +196,6 @@ void evaluate_menu(Polynomial *poly)
         }
     }
 }
-/*
-void clone_menu(Polynomial *poly)
-{
-    if(!poly)
-    {
-        printf("\nОшибка - нет многочлена!\n");
-        return;
-    }
-
-    printf("Оригинал: ");
-    polynomial_print(poly);
-
-    Polynomial *clone = polynomial_clone(poly);
-    if(clone)
-    {
-
-    }
-}
- */
 
 void print_menu(void)
 {
