@@ -197,6 +197,7 @@ void evaluate_menu(Polynomial *poly)
     }
 }
 
+
 void print_menu(void)
 {
     printf("_______________________________\n");
