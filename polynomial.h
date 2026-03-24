@@ -9,11 +9,11 @@ typedef struct polynomial
     void *coeff; //динамический массив коэф
     size_t degree; //степень многочлена
     size_t capacity; //вместимость дин массива для элементов
-    Field_info *type_info; //тип коэф
+    const Field_info *type_info; //тип коэф
 } Polynomial;
 
 //создвние пустого многочлена с типом коэффициентов
-Polynomial *polynomial_create(Field_info *type_info);
+Polynomial *polynomial_create(const Field_info *type_info);
 
 void polynomial_destroy(Polynomial *poly);
 

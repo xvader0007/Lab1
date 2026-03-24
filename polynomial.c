@@ -66,7 +66,7 @@ static void polynomial_update_degree(Polynomial* poly)
     poly->degree = 0;
 }
 
-Polynomial *polynomial_create(Field_info* type_info)
+Polynomial *polynomial_create(const Field_info* type_info)
 {
     Polynomial* poly;
 

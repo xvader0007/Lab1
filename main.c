@@ -151,7 +151,7 @@ void mult_scal_menu(Polynomial* poly)
         scanf("%d", &scal);
         value.imag_part = scal;
 
-        polynomial_mult_scal(poly, &scal);
+        polynomial_mult_scal(poly, &value);
     }
 
     printf("P * скаляр = ");
@@ -188,7 +188,7 @@ void evaluate_menu(Polynomial *poly)
         scanf("%d", &x);
         value.imag_part = x;
 
-        if(polynomial_evaluate(poly, &x, &result) == 0)
+        if(polynomial_evaluate(poly, &value, &result) == 0)
         {
             printf("P(x) = ");
             complex_print(result);
