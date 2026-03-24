@@ -7,6 +7,12 @@
 #include "tests.h"
 #include <windows.h>
 
+void clear_input(void)
+{
+    int input;
+    while ((input = getchar()) != '\n' && input != EOF);
+}
+
 Polynomial* create_polynomial_menu(void)
 {
     Polynomial *poly = NULL;
@@ -17,7 +23,13 @@ Polynomial* create_polynomial_menu(void)
     printf("1) int\n");
     printf("2) complex\n");
     printf("Ввод: ");
-    scanf("%d", &choice);
+
+    if(scanf("%d", &choice) != 1)
+    {
+        clear_input();
+        printf("\nОшибка ввода!\n");
+        return NULL;
+    }
 
     if(choice == 1) poly = polynomial_create(field_info_get_int());
     else if(choice == 2) poly = polynomial_create(field_info_get_complex());
@@ -34,24 +46,48 @@ Polynomial* create_polynomial_menu(void)
     }
 
     printf("Введите количество коэффициентов: ");
-    scanf("%d", &coef_count);
+    if(scanf("%d", &coef_count) != 1)
+    {
+        clear_input();
+        printf("\nОшибка ввода!\n");
+        polynomial_destroy(poly);
+        return NULL;
+    }
 
     for(int i = 0; i < coef_count; i++)
     {
         if(choice == 1)
         {
             printf("\nВведите коэффициент: ");
-            scanf("%d", &coef);
+            if(scanf("%d", &coef) != 1)
+            {
+                clear_input();
+                printf("\nОшибка ввода!\n");
+                polynomial_destroy(poly);
+                return NULL;
+            }
             polynomial_set_coef(poly, i, &coef);
         }
         else if(choice == 2)
         {
             printf("\nДействительная часть: ");
-            scanf("%d", &coef);
+            if(scanf("%d", &coef) != 1)
+            {
+                clear_input();
+                printf("\nОшибка ввода!\n");
+                polynomial_destroy(poly);
+                return NULL;
+            }
             value.real_part = coef;
 
             printf("\nМнимая часть: ");
-            scanf("%d", &coef);
+            if(scanf("%d", &coef) != 1)
+            {
+                clear_input();
+                printf("\nОшибка ввода!\n");
+                polynomial_destroy(poly);
+                return NULL;
+            }
             value.imag_part = coef;
 
             polynomial_set_coef(poly, i, &value);
@@ -134,7 +170,12 @@ void mult_scal_menu(Polynomial* poly)
         int scal;
 
         printf("Введите скаляр (int): ");
-        scanf("%d", &scal);
+        if(scanf("%d", &scal) != 1)
+        {
+            clear_input();
+            printf("Ошибка ввода!\n");
+            return;
+        }
         polynomial_mult_scal(poly, &scal);
     }
     else
@@ -142,13 +183,21 @@ void mult_scal_menu(Polynomial* poly)
         int scal;
         Complex value;
 
-        printf("Введите скаляр (int): \n");
+        printf("Введите скаляр (Complex): \n");
         printf("\nДействительная часть: ");
-        scanf("%d", &scal);
+        if(scanf("%d", &scal) != 1)
+        {
+            clear_input();
+            printf("\nОшибка ввода!\n");
+        }
         value.real_part = scal;
 
         printf("\nМнимая часть: ");
-        scanf("%d", &scal);
+        if(scanf("%d", &scal) != 1)
+        {
+            clear_input();
+            printf("\nОшибка ввода!\n");
+        }
         value.imag_part = scal;
 
         polynomial_mult_scal(poly, &value);
@@ -173,19 +222,34 @@ void evaluate_menu(Polynomial *poly)
     {
         int x, result;
         printf("Введите x: ");
-        scanf("%d", &x);
-        if(polynomial_evaluate(poly, &x, &result) == 0) printf("P(%d) = %d\n");
+        if(scanf("%d", &x) != 1)
+        {
+            clear_input();
+            printf("Ошибка ввода!\n");
+            return;
+        }
+        if(polynomial_evaluate(poly, &x, &result) == 0) printf("P(%d) = %d\n", x, result);
     }
     else
     {
         int x;
         Complex value, result;
         printf("\nДействительная часть: ");
-        scanf("%d", &x);
+        if(scanf("%d", &x) != 1)
+        {
+            clear_input();
+            printf("Ошибка ввода!\n");
+            return;
+        }
         value.real_part = x;
 
         printf("\nМнимая часть: ");
-        scanf("%d", &x);
+        if(scanf("%d", &x) != 1)
+        {
+            clear_input();
+            printf("Ошибка ввода!\n");
+            return;
+        }
         value.imag_part = x;
 
         if(polynomial_evaluate(poly, &value, &result) == 0)
@@ -234,7 +298,13 @@ int main(void)
     {
         print_menu();
         printf("Ваш выбор: ");
-        scanf("%d", &choice);
+
+        if(scanf("%d", &choice) != 1)
+        {
+            clear_input();
+            printf("Ошибка ввода!\n\n");
+            continue;
+        }
 
         switch(choice)
         {
@@ -255,24 +325,16 @@ int main(void)
                     polynomial_print(poly1);
                     break;
                 }
-                else
-                {
-                    printf("P1 не создан!\n");
-                    break;
-                }
+                else printf("P1 не создан!\n");
 
             case 4:
                 if(poly2)
                 {
                     printf("P2 = ");
                     polynomial_print(poly2);
-                    break;
                 }
-                else
-                {
-                    printf("P2 не создан!\n");
-                    break;
-                }
+                else printf("P2 не создан!\n");
+                break;
 
             case 5:
                 add_polynomials(poly1, poly2);
@@ -300,9 +362,10 @@ int main(void)
 
             case 11:
                 tests_run_all();
+                break;
 
             case 0:
-                printf("Выход из программы\n");
+                printf("Выход из программы...\n");
                 break;
 
             default:
