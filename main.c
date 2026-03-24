@@ -189,6 +189,7 @@ void mult_scal_menu(Polynomial* poly)
         {
             clear_input();
             printf("\nОшибка ввода!\n");
+            return;
         }
         value.real_part = scal;
 
@@ -197,6 +198,7 @@ void mult_scal_menu(Polynomial* poly)
         {
             clear_input();
             printf("\nОшибка ввода!\n");
+            return;
         }
         value.imag_part = scal;
 
