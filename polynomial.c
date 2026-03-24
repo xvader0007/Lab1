@@ -100,7 +100,6 @@ void polynomial_destroy(Polynomial* poly)
     free(poly);
 }
 
-
 void polynomial_clear(Polynomial* poly)
 {
     if(!poly || !poly->type_info) return;
