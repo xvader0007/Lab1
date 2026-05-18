@@ -266,38 +266,29 @@ int polynomial_mult_scal(Polynomial* poly, const void* scalar)
     return 0;
 }
 
-int polynomial_evaluate(const Polynomial *poly, const void *x, void *result)
-{
-    void *coef;
+int polynomial_evaluate(const Polynomial *poly, const void *x, void *result) {
+    if(!poly || !x || !result || !poly->type_info->add || !poly->type_info->mult) return -1;
 
-    if (!poly || !x || !result || !poly->type_info) return -1;
-    if (!poly->type_info->add || !poly->type_info->mult) return -1;
-
-    if (poly->degree == 0) {
-        coef = polynomial_get_coef_ptr(poly, 0);
-        if (!coef) return -1;
-        memcpy(result, coef, poly->type_info->size_el);
+    if(poly->degree == 0) {
+        void *c = polynomial_get_coef_ptr(poly, 0);
+        if(!c) return -1;
+        memcpy(result, c, poly->type_info->size_el);
         return 0;
     }
 
-    coef = polynomial_get_coef_ptr(poly, poly->degree);
-    if (!coef) return -1;
+    void *c = polynomial_get_coef_ptr(poly, poly->degree);
+    memcpy(result, c, poly->type_info->size_el);
 
-    memcpy(result, coef, poly->type_info->size_el);
+    for(int i = poly->degree; i > 0; i--) {
+        poly->type_info->mult(result, x, result); // result *= x
 
-    for (int i = (int)poly->degree; i > 0; i--)
-    {
-        poly->type_info->mult(result, x, result);
-
-        coef = polynomial_get_coef_ptr(poly, i - 1);
-        if (coef) {
-            poly->type_info->add(result, coef, result);
+        c = polynomial_get_coef_ptr(poly, i-1);
+        if(c) {
+            poly->type_info->add(result, c, result); // result += a[i-1]
         }
     }
-
     return 0;
 }
-
 
 void polynomial_print(const Polynomial* poly)
 {

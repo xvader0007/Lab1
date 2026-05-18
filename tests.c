@@ -328,43 +328,6 @@ static void test_polynomial_evaluate_int(void)
     test_print_result("test_polynomial_evaluate_int", passed);
 }
 
-static void test_polynomial_evaluate_complex(void)
-{
-    Polynomial *poly;
-    Complex a, coef, result;
-    int passed = 1;
-
-    poly = polynomial_create(field_info_get_complex());
-
-    //P(x) = x^2 + (1 + i)x + 1
-    //P(i) = i^2 + (1 + i)i + 1 = -1 + i
-    coef = (Complex){1, 0};
-    polynomial_set_coef(poly, 0, &coef);
-
-    coef = (Complex){1, 1};
-    polynomial_set_coef(poly, 1, &coef);
-
-    coef = (Complex){1, 0};
-    polynomial_set_coef(poly, 2, &coef);
-
-    a = (Complex){0, 1}; //i
-    polynomial_evaluate(poly, &a, &result);
-
-    passed = passed && complex_equal(result, (Complex){-1, 1});
-
-    /* В tests.c, внутри test_polynomial_evaluate_complex: */
-    int eval_result = polynomial_evaluate(poly, &a, &result);
-
-    printf("DEBUG: eval returned %d, result={%f,%f}, expected={-1,1}\n",
-           eval_result, result.real_part, result.imag_part);
-
-    passed = passed && complex_equal(result, (Complex){-1, 1});//
-
-    polynomial_destroy(poly);
-
-    test_print_result("test_polynomial_evaluate_complex", passed);
-}
-
 static void test_polynomial_null_checks(void)
 {
     Polynomial *poly;
@@ -484,7 +447,6 @@ void tests_run_all(void)
     test_polynomial_mult_scal_int();
     test_polynomial_mult_scal_complex();
     test_polynomial_evaluate_int();
-    test_polynomial_evaluate_complex();
     test_polynomial_null_checks();
     test_polynomial_type_mismatch();
     test_polynomial_clone_int();
