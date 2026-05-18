@@ -352,6 +352,14 @@ static void test_polynomial_evaluate_complex(void)
 
     passed = passed && complex_equal(result, (Complex){-1, 1});
 
+    /* В tests.c, внутри test_polynomial_evaluate_complex: */
+    int eval_result = polynomial_evaluate(poly, &a, &result);
+
+    printf("DEBUG: eval returned %d, result={%f,%f}, expected={-1,1}\n",
+           eval_result, result.real_part, result.imag_part);
+
+    passed = passed && complex_equal(result, (Complex){-1, 1});//
+
     polynomial_destroy(poly);
 
     test_print_result("test_polynomial_evaluate_complex", passed);
